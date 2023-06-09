@@ -5,6 +5,7 @@ enum class AMEPlusScreens {
     AMEPlusSplashScreen,
     AMEPlusMainScreen,
     DespatchScreen,
+    LoginScreen,
     PrintersScreen,
     SettingScreen,
     WarehouseScanAndMatchScreen

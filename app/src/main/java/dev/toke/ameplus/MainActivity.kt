@@ -35,8 +35,7 @@ fun AMEPlusApp() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally) {
+            Column() {
                 AMEPlusNavigation()
             }
 

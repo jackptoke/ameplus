@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dev.toke.ameplus.screens.despatch.DespatchScreen
+import dev.toke.ameplus.screens.login.LoginScreen
 import dev.toke.ameplus.screens.main.AMEPlusMainScreen
 import dev.toke.ameplus.screens.splash.AMEPlusSplashScreen
 import dev.toke.ameplus.screens.warehouse.WarehouseScanAndMatchScreen
@@ -19,9 +21,17 @@ fun AMEPlusNavigation() {
         composable(AMEPlusScreens.AMEPlusMainScreen.name) {
             AMEPlusMainScreen(navController = navController)
         }
+        
+        composable(AMEPlusScreens.DespatchScreen.name) {
+            DespatchScreen(navController = navController)
+        }
 
         composable(AMEPlusScreens.WarehouseScanAndMatchScreen.name) {
             WarehouseScanAndMatchScreen(navController = navController)
+        }
+        
+        composable(AMEPlusScreens.LoginScreen.name) {
+            LoginScreen(navController = navController)
         }
     }
 }

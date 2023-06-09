@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,23 +41,37 @@ fun AMEPlusSplashScreen(navController: NavController) {
             easing = { OvershootInterpolator(8f).getInterpolation(it) }
         ))
         delay(2000L)
-        navController.navigate(AMEPlusScreens.AMEPlusMainScreen.name)
+        navController.navigate(AMEPlusScreens.LoginScreen.name)
     })
-    Surface(modifier = Modifier
-        .padding(15.dp)
-        .size(230.dp)
-        .background(Color.Transparent)
-        .scale(scale.value),
-        shape = CircleShape,
-        border = BorderStroke(width = 3.dp, color = Color.LightGray)
-    ) {
-        Column(modifier = Modifier.padding(1.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center) {
-            Image(painter = painterResource(id = R.drawable.ameplus),
-                contentDescription = "AME Plus Logo", contentScale = ContentScale.Fit, modifier = Modifier.width(135.dp))
-            Text("Efficiency is our priority", style = MaterialTheme.typography.titleSmall,
-                color = Color.LightGray, modifier = Modifier.padding(6.dp))
+    Column(modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        Surface(modifier = Modifier
+            .padding(15.dp)
+            .size(230.dp)
+            .background(Color.Transparent)
+            .scale(scale.value),
+            shape = CircleShape,
+            border = BorderStroke(width = 3.dp, color = Color.LightGray,
+                )
+        ) {
+            Column(
+                modifier = Modifier.padding(1.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ameplus),
+                    contentDescription = "AME Plus Logo",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.width(135.dp)
+                )
+                Text(
+                    "Efficiency is our priority", style = MaterialTheme.typography.titleSmall,
+                    color = Color.LightGray, modifier = Modifier.padding(6.dp)
+                )
+            }
         }
+
     }
 }
