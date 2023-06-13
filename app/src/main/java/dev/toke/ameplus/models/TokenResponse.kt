@@ -1,6 +1,9 @@
 package dev.toke.ameplus.models
 
-data class AuthResponse(
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class TokenResponse(
     val expiration: String,
     val message: String,
     val name: String,

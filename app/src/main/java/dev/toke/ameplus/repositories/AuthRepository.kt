@@ -1,9 +1,11 @@
 package dev.toke.ameplus.repositories
 
 import dev.toke.ameplus.data.DataOrException
-import dev.toke.ameplus.models.AuthResponse
+import dev.toke.ameplus.models.AuthResult
+import dev.toke.ameplus.models.TokenResponse
 
 interface AuthRepository {
-    suspend fun refreshToken(refreshToken: String): String
-    suspend fun signIn(username: String): DataOrException<AuthResponse, Boolean, Exception>
+    suspend fun refreshToken(accessToken: String, refreshToken: String): AuthResult<Unit>
+    suspend fun signIn(username: String): AuthResult<Unit>
+    suspend fun authenticate(): AuthResult<Unit>
 }
