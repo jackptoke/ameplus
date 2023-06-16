@@ -1,4 +1,4 @@
-package dev.toke.ameplus.models
+package dev.toke.ameplus.data
 
 sealed class AuthResult<T>(val data: T? = null) {
     class Authorized<T>(data: T? = null): AuthResult<T>(data)

@@ -3,8 +3,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     id("com.google.dagger.hilt.android")
-    kotlin("kapt")
     kotlin("plugin.serialization") version "1.8.22"
+    kotlin("kapt")
 }
 
 android {
@@ -86,12 +86,18 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:2.6.1")
 
     // Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
 
     // Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+
+    // Preferences Datastore
+    implementation("androidx.datastore:datastore-preferences-core:1.0.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation(libs.core.ktx)
     implementation(libs.appcompat)

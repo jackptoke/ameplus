@@ -7,8 +7,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.toke.ameplus.models.AuthResult
-import dev.toke.ameplus.models.AuthState
+import dev.toke.ameplus.data.AuthResult
+import dev.toke.ameplus.data.AuthState
+import dev.toke.ameplus.models.TokenResponse
 import dev.toke.ameplus.repositories.AuthRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -19,11 +20,12 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(private val authRepo: AuthRepository): ViewModel() {
     var state by mutableStateOf(AuthState())
 
-    private val resultChannel = Channel<AuthResult<Unit>>()
+    private val resultChannel = Channel<AuthResult<TokenResponse?>>()
     val authResult = resultChannel.receiveAsFlow()
 
     init {
         authenticate()
+//        signOut()
     }
 
     fun onEvent(event: AuthUiEvent) {
@@ -37,6 +39,11 @@ class LoginViewModel @Inject constructor(private val authRepo: AuthRepository): 
                 signIn()
 
             }
+//            is AuthUiEvent.SignOut -> {
+//                Log.d("LoginViewModel", "OnEvent - signing out")
+//                signOut()
+//            }
+            else -> {}
         }
     }
 
@@ -46,7 +53,7 @@ class LoginViewModel @Inject constructor(private val authRepo: AuthRepository): 
             state = state.copy(isLoading = true)
             Log.d("LoginViewModel", "Loading state copied for ${ state.signInUsername }")
             val result = authRepo.signIn(state.signInUsername)
-            Log.d("LoginViewModel", "SignIn result received ${ result.data.toString() }")
+            Log.d("LoginViewModel", "SignIn result received ")
             resultChannel.send(result)
             state = state.copy(isLoading = false)
             Log.d("LoginViewModel", "SignIn completed")
@@ -60,6 +67,14 @@ class LoginViewModel @Inject constructor(private val authRepo: AuthRepository): 
             resultChannel.send(result)
             state = state.copy(isLoading = false)
             Log.d("LoginViewModel", "Authenticate launched")
+        }
+    }
+
+    private fun signOut() {
+        viewModelScope.launch {
+            authRepo.signOut()
+            resultChannel.send(AuthResult.Unauthorized())
+            Log.d("LoginViewModel", "Sign-out")
         }
     }
 

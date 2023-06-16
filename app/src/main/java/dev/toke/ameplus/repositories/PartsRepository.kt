@@ -2,26 +2,58 @@ package dev.toke.ameplus.repositories
 
 import android.util.Log
 import dev.toke.ameplus.data.DataOrException
+import dev.toke.ameplus.models.Part
 import dev.toke.ameplus.models.PartsData
+import dev.toke.ameplus.models.ProductPart
 import dev.toke.ameplus.network.AMEPartsApi
+import dev.toke.ameplus.network.AmePlusApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class PartsRepository @Inject constructor(private val partApi: AMEPartsApi) {
-    private val partsDto = DataOrException<PartsData, Boolean, Exception>()
+class PartsRepository @Inject constructor(private val partApi: AMEPartsApi, private val authRepo: AuthRepositoryImpl) {
 
-    suspend fun getParts(partNumber: String): DataOrException<PartsData, Boolean, Exception> {
-      try {
+    suspend fun getParts(partNumber: String) = GlobalScope.async {
+        val partsDto = DataOrException<PartsData, Boolean, Exception>()
+        Log.d("PartsRepository", "getParts - Token: ${ authRepo.accessToken.value?.token }")
+        try {
           partsDto.loading = true
-          partsDto.data = partApi.getPart(partNumber)
-
-          if(partsDto.data.toString().isNotEmpty()) partsDto.loading = false
-          Log.d("PartsRepository", "getParts - data - ${ (partsDto.data as PartsData).toString() }")
+          partsDto.data = authRepo.accessToken.value?.let { partApi.getParts(partNumber, token = "Bearer ${it.token}") }
+          Log.d("PartsRepository", "Part: $partNumber Result: ${partsDto.data?.toString()}")
+          if(partsDto.data != null) {
+              Log.d("PartsRepository", "Part: $partNumber - Positive - ${ (partsDto.data as PartsData).toString() }")
+          }
+          partsDto.loading = false
       }catch(exception: Exception) {
           partsDto.exception = exception
+          partsDto.loading = false
           Log.d("PartRepository", "getParts: - exception - ${exception.localizedMessage}")
       }
-        return partsDto
+        partsDto
+    }
+
+    suspend fun getPart(partNumber: String) = GlobalScope.async {
+        val partDto = DataOrException<ProductPart, Boolean, Exception>()
+        try {
+            partDto.loading = true
+            partDto.data = authRepo.accessToken.value?.let {
+                Log.d("PartsRepository", "getPart - partNumber - $partNumber")
+                Log.d("PartsRepository", "getPart - token - ${it.token}")
+                val result = partApi.getPartByPartNumber(partNumber, token = "Bearer ${it.token}")
+                Log.d("PartsRepository", "getPart - result - ${result.toString()}")
+                result
+            }
+            partDto.loading = false
+        }catch(ex: Exception) {
+            Log.d("PartsRepository", "getPart - exception - ${ex.localizedMessage}")
+            partDto.exception = ex
+            partDto.loading = false
+        }
+        Log.d("DespatchViewModel", "CheckBarcode - data - ${partDto.data.toString()}")
+        partDto
     }
 }
+
+

@@ -1,4 +1,4 @@
-package dev.toke.ameplus.models
+package dev.toke.ameplus.data
 
 data class AuthState(
     val isLoading: Boolean = false,

@@ -27,21 +27,25 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.toke.ameplus.R
 import dev.toke.ameplus.navigation.AMEPlusScreens
 import kotlinx.coroutines.delay
 
 @Composable
-fun AMEPlusSplashScreen(navController: NavController) {
+fun AMEPlusSplashScreen(navController: NavController, viewModel: SplashViewModel = hiltViewModel()) {
     val scale = remember{ Animatable(0f) }
     LaunchedEffect(key1 = true, block = {
+
         scale.animateTo(targetValue = 0.9f, animationSpec = tween(
             durationMillis = 800,
             easing = { OvershootInterpolator(8f).getInterpolation(it) }
         ))
         delay(2000L)
-        navController.navigate(AMEPlusScreens.LoginScreen.name)
+        if(viewModel.token == null)
+            navController.navigate(AMEPlusScreens.LoginScreen.name)
+        else navController.navigate(AMEPlusScreens.AMEPlusMainScreen.name)
     })
     Column(modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

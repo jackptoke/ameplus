@@ -1,28 +1,22 @@
 package dev.toke.ameplus.repositories
 
 import android.util.Log
-import dev.toke.ameplus.data.DataOrException
-import dev.toke.ameplus.models.AuthRequest
-import dev.toke.ameplus.models.AuthResult
+import androidx.lifecycle.LiveData
+import dev.toke.ameplus.dtos.SSOUser
+import dev.toke.ameplus.data.AuthResult
 import dev.toke.ameplus.models.TokenResponse
-import dev.toke.ameplus.network.AppSharedPreferences
-import dev.toke.ameplus.network.AuthApi
+import dev.toke.ameplus.network.AmePlusApi
 import retrofit2.HttpException
 import javax.inject.Inject
 
-class AuthRepositoryImpl @Inject constructor(private val authApi: AuthApi, private val prefs: AppSharedPreferences): AuthRepository {
-//    private val authDto = DataOrException<TokenResponse, Boolean, Exception>()
-    override suspend fun refreshToken(accessToken: String, refreshToken: String): AuthResult<Unit> {
+class AuthRepositoryImpl @Inject constructor(private val authApi: AmePlusApi, private val dataStoreRepository: DataStoreRepository): AuthRepository {
+    val accessToken: LiveData<TokenResponse?>
+        get() = dataStoreRepository.validAccessToken
+
+    override suspend fun refreshToken(accessToken: String, refreshToken: String): AuthResult<TokenResponse?> {
         try {
-            val userData = prefs.getUserData()
-            val newToken = userData?.let { authApi.refresh(accessToken = it.token, refreshToken = it.refreshToken, token = "Bearer ${userData.token}") }
-            if(newToken.toString().isNullOrEmpty()) {
-                if (newToken != null) {
-                    prefs.setAccessToken(newToken.token)
-                    prefs.setUserData(newToken)
-                    return AuthResult.Authorized()
-                }
-            }
+            val token = dataStoreRepository.getTokenFromDataStore()
+            // TODO
             return AuthResult.UnknownError()
         } catch(exception: HttpException) {
             if(exception.code() == 401) {
@@ -32,34 +26,57 @@ class AuthRepositoryImpl @Inject constructor(private val authApi: AuthApi, priva
         }
     }
 
-    override suspend fun signIn(username: String): AuthResult<Unit> {
+    override suspend fun signIn(username: String): AuthResult<TokenResponse?> {
         try {
             Log.d("AuthRepositoryImpl", "Sign-in - start $username")
-            val tokenResponse = authApi.signIn(username)
-            Log.d("AuthRepositoryImpl", "Login - token received 1")
+            val tokenResponse = authApi.signIn(SSOUser(userName = username))
+
+            Log.d("AuthRepositoryImpl", "Login - token received 1 ${ tokenResponse.toString() }")
             if(tokenResponse.toString().isNotEmpty()) {
-                prefs.setAccessToken(tokenResponse.token)
-                prefs.setUserData(userData = tokenResponse)
+                dataStoreRepository.saveTokenToDataStore(tokenResponse)
+                Log.d("AuthRepositoryImpl", "Login - authorized")
+                return AuthResult.Authorized(data = tokenResponse)
             }
-            Log.d("AuthRepositoryImpl", "Login - token received 2")
-            return AuthResult.Authorized()
-        } catch(exception: HttpException) {
+            Log.d("AuthRepositoryImpl", "Login - unauthorized")
+            return AuthResult.Unauthorized()
+        } catch(exception: Exception) {
             Log.d("AuthRepositoryImpl", "Login - exception - ${exception.localizedMessage}")
-            if(exception.code() == 401) return AuthResult.Unauthorized()
+
+            when(exception) {
+                is HttpException -> {
+                    if(exception.code() == 401) return AuthResult.Unauthorized()
+                }
+                else -> {}
+            }
             return AuthResult.UnknownError()
         }
     }
 
-    override suspend fun authenticate(): AuthResult<Unit> {
+    override suspend fun authenticate(): AuthResult<TokenResponse?> {
         try {
-            val token = prefs.getAccessToken() ?: return AuthResult.Unauthorized()
-
-            Log.d("AuthRepositoryImpl", "Authenticate - completed - $token")
-            return AuthResult.Authorized()
-        } catch(exception: HttpException) {
+            lateinit var result: AuthResult<TokenResponse?>
+            Log.d("AuthRepositoryImpl", "Authenticate - before getting token from data store")
+            dataStoreRepository.getTokenFromDataStore().collect {
+                Log.d("AuthRepositoryImpl", "Authenticate - token")
+                result = if(it == null) AuthResult.Unauthorized() else AuthResult.Authorized(data = it)
+            }
+            Log.d("AuthRepositoryImpl", "Authenticate - after getting token from data store")
+            return result
+        }
+        catch(exception: Exception) {
             Log.d("AuthRepositoryImpl", "Authenticate - exception - ${exception.localizedMessage}")
-            if(exception.code() == 401) return AuthResult.Unauthorized()
             return AuthResult.UnknownError()
         }
+    }
+
+    override suspend fun signOut(): AuthResult<TokenResponse?> {
+        return try {
+            dataStoreRepository.deleteTokenFromDataStore()
+            AuthResult.Unauthorized()
+        } catch (exception: Exception) {
+            exception.localizedMessage?.let { Log.d("AuthRepositoryImpl", it) }
+            AuthResult.UnknownError()
+        }
+
     }
 }
