@@ -14,6 +14,7 @@ import dev.toke.ameplus.repositories.AuthRepository
 import dev.toke.ameplus.repositories.AuthRepositoryImpl
 import dev.toke.ameplus.repositories.DataStoreRepository
 import dev.toke.ameplus.repositories.PartsRepository
+import dev.toke.ameplus.services.ExoPlayerService
 import dev.toke.ameplus.utils.Constants
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -29,7 +30,7 @@ object AppModule {
     fun provideRetrofit(): Retrofit {
         Log.d("AppModule", "AuthApi provided")
         return Retrofit.Builder()
-            .baseUrl(Constants.API_BASE_URL_DEV)
+            .baseUrl(Constants.API_BASE_URL_PROD)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -68,6 +69,8 @@ object AppModule {
         authRepo: AuthRepositoryImpl): PartsRepository
     = PartsRepository(partApi = partApi, authRepo = authRepo)
 
-
+    @Provides
+    @Singleton
+    fun provideExoPlayerService(@ApplicationContext context: Context): ExoPlayerService = ExoPlayerService(context)
 
 }

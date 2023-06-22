@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.toke.ameplus.models.ProductInfo
 import dev.toke.ameplus.repositories.PartsRepository
 import dev.toke.ameplus.repositories.ProductRepository
+import dev.toke.ameplus.services.ExoPlayerService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -17,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DespatchViewModel @Inject constructor(private val productRepository: ProductRepository,
-                                            private val partsRepository: PartsRepository): ViewModel() {
+                                            private val partsRepository: PartsRepository, private val exoPlayerService: ExoPlayerService): ViewModel() {
     var scanState by mutableStateOf(DespatchScanState())
 
     private val scanResultChannel = Channel<DespatchScanResult<ProductInfo>>()
@@ -29,6 +30,14 @@ class DespatchViewModel @Inject constructor(private val productRepository: Produ
                 checkBarcode(barcode = event.barcode)
             }
         }
+    }
+
+    fun playErrorSound() {
+        exoPlayerService.playError()
+    }
+
+    fun playGoodSound() {
+        exoPlayerService.playGoodSound()
     }
 
     private fun checkBarcode(barcode: String) {
@@ -72,4 +81,6 @@ class DespatchViewModel @Inject constructor(private val productRepository: Produ
             scanResultChannel.send(scanResult)
         }
     }
+
+
 }

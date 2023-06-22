@@ -122,27 +122,10 @@ fun DespatchScreen(navController: NavController,
 
     LaunchedEffect(key1 = isNotMatched, key2 = isMatched, context) {
         if(isNotMatched) {
-            if(badSoundPlayer.isPlaying) {
-                badSoundPlayer.stop()
-                badSoundPlayer.reset()
-                badSoundPlayer.prepareAsync()
-                badSoundPlayer.start()
-            }
-            else {
-                badSoundPlayer.start()
-            }
-
+            despatchViewModel.playErrorSound()
         }
         else if(isMatched) {
-            if(goodSoundPlayer.isPlaying) {
-                badSoundPlayer.stop()
-                badSoundPlayer.reset()
-                goodSoundPlayer.prepareAsync()
-                goodSoundPlayer.start()
-            }
-            else {
-                goodSoundPlayer.start()
-            }
+            despatchViewModel.playGoodSound()
 
         }
     }

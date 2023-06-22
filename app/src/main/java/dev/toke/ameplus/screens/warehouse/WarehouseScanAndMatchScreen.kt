@@ -4,6 +4,7 @@ import android.media.MediaPlayer
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,12 +26,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -49,8 +55,17 @@ fun WarehouseScanAndMatchScreen(navController: NavController,
 
     val state = warehouseSAMSViewModel.scanState
     val context = LocalContext.current
-    val goodSoundPlayer: MediaPlayer = MediaPlayer.create(context, R.raw.correct_choice)
-    val badSoundPlayer: MediaPlayer = MediaPlayer.create(context, R.raw.lostitem)
+    val numOfParts = warehouseSAMSViewModel.partsDataList.value?.count() ?: 0
+    val isMismatched =
+        numOfParts == 2 && ((warehouseSAMSViewModel.partsDataList.value?.get(0)?.get(0)?.partNumber
+            ?: "y") != (warehouseSAMSViewModel.partsDataList.value?.get(1)
+            ?.get(0)?.partNumber ?: "x"))
+    var isMatched: Boolean by remember {
+        mutableStateOf(false)
+    }
+    var selectedPartIndex by remember {
+        mutableStateOf(0)
+    }
 
     LaunchedEffect(warehouseSAMSViewModel, context) {
         warehouseSAMSViewModel.scanResults.collect {result ->
@@ -61,7 +76,10 @@ fun WarehouseScanAndMatchScreen(navController: NavController,
                         warehouseSAMSViewModel.partsDataList.value?.count() == 2 && ((warehouseSAMSViewModel.partsDataList.value?.get(0)?.get(0)?.partNumber
                             ?: "y") != (warehouseSAMSViewModel.partsDataList.value?.get(1)
                             ?.get(0)?.partNumber ?: "x"))
-                    if(isMismatched) badSoundPlayer.start()
+                    isMatched = warehouseSAMSViewModel.partsDataList.value?.count() == 2 && (warehouseSAMSViewModel.partsDataList.value?.get(0)?.get(0)?.partNumber
+                        == warehouseSAMSViewModel.partsDataList.value?.get(1)?.get(0)?.partNumber)
+                    if(isMismatched) warehouseSAMSViewModel.playErrorSound()
+                    else if(isMatched) warehouseSAMSViewModel.playGoodSound()
                 }
                 is ScanResult.NotFound -> {
                     Toast.makeText(context,"Not found", Toast.LENGTH_SHORT).show()
@@ -91,11 +109,7 @@ fun WarehouseScanAndMatchScreen(navController: NavController,
             }
         }
     }
-    val numOfParts = warehouseSAMSViewModel.partsDataList.value?.count() ?: 0
-    val isMismatched =
-        numOfParts == 2 && ((warehouseSAMSViewModel.partsDataList.value?.get(0)?.get(0)?.partNumber
-            ?: "y") != (warehouseSAMSViewModel.partsDataList.value?.get(1)
-            ?.get(0)?.partNumber ?: "x"))
+
     Column(verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()) {
@@ -130,16 +144,28 @@ fun WarehouseScanAndMatchScreen(navController: NavController,
             .height(440.dp),
             color = MaterialTheme.colorScheme.background
             ) {
-            if(warehouseSAMSViewModel.partsDataList.value?.count()!! > 0) {
-                LazyRow {
-                    warehouseSAMSViewModel.partsDataList.value?.let {
-                        items(it[0]) {part ->
-                            PartShowcase(title = part.partNumber, subTitle = part.partTitle, imageUrl = "${Constants.IMAGE_BASE_URL}${part.imagePath}")
+            Column(verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                if(warehouseSAMSViewModel.partsDataList.value?.count()!! > 0) {
+                    LazyRow {
+                        warehouseSAMSViewModel.partsDataList.value?.let {
+                            items(it[selectedPartIndex]) {part ->
+                                PartShowcase(title = part.partNumber, subTitle = part.partTitle,
+                                    imageUrl = "${Constants.IMAGE_BASE_URL}${part.imagePath}")
+                            }
                         }
                     }
-                }
 
+                }
+                if(isMismatched) {
+                    Text(text = "PARTS MISMATCHED!",
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Black,
+                        color = Color.Red.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(top = 25.dp))
+                }
             }
+
         }
 
         Surface(modifier = Modifier
@@ -156,13 +182,15 @@ fun WarehouseScanAndMatchScreen(navController: NavController,
                 warehouseSAMSViewModel.partsDataList.value?.let { partsList ->
                     Row(horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.width(230.dp).height(80.dp)) {
+                        modifier = Modifier
+                            .width(230.dp)
+                            .height(80.dp)) {
                     if(partsList.count() == 0) {
                             Text(text = "READY", style = MaterialTheme.typography.headlineLarge,
                                 color = MaterialTheme.colorScheme.inversePrimary)
                     }
                     else {
-                        for (part in partsList) {
+                        for ((index, part) in partsList.withIndex()) {
                             val imageUrl = "${Constants.IMAGE_BASE_URL}${part[0].imagePath}"
                             AsyncImage(
                                 model = imageUrl,
@@ -172,6 +200,7 @@ fun WarehouseScanAndMatchScreen(navController: NavController,
                                     .height(80.dp)
                                     .width(80.dp)
                                     .clip(RoundedCornerShape(5.dp))
+                                    .clickable { selectedPartIndex = index }
                             )
                         }
                         val emptyCount = 2 - partsList.count()

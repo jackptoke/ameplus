@@ -8,18 +8,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.exoplayer.ExoPlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.toke.ameplus.data.ScanResult
 import dev.toke.ameplus.data.ScanUiEvent
 import dev.toke.ameplus.models.PartsData
 import dev.toke.ameplus.repositories.PartsRepository
+import dev.toke.ameplus.services.ExoPlayerService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WarehouseScanNMatchViewModel @Inject constructor(val partsRepository: PartsRepository) : ViewModel() {
+class WarehouseScanNMatchViewModel @Inject constructor(val partsRepository: PartsRepository, val exoPlayerService: ExoPlayerService) : ViewModel() {
+
+    private lateinit var exoPlayer: ExoPlayer
     var scanState by mutableStateOf(ScanAndMatchState())
 
     private val scanResultChannel = Channel<ScanResult<PartsData>>()
@@ -32,6 +36,10 @@ class WarehouseScanNMatchViewModel @Inject constructor(val partsRepository: Part
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean>
         get() = _isLoading
+
+    init {
+
+    }
 
     fun onEvent(event: ScanUiEvent) {
 
@@ -91,5 +99,13 @@ class WarehouseScanNMatchViewModel @Inject constructor(val partsRepository: Part
             scanResultChannel.send(scanResult)
         }
 
+    }
+
+    fun playGoodSound() {
+        exoPlayerService.playGoodSound()
+    }
+
+    fun playErrorSound() {
+        exoPlayerService.playError()
     }
 }
