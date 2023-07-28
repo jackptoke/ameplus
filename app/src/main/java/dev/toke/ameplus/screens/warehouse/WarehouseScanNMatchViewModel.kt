@@ -23,7 +23,6 @@ import javax.inject.Inject
 @HiltViewModel
 class WarehouseScanNMatchViewModel @Inject constructor(private val partsRepository: PartsRepository, private val exoPlayerService: ExoPlayerService) : ViewModel() {
 
-    private lateinit var exoPlayer: ExoPlayer
     var scanState by mutableStateOf(ScanAndMatchState())
 
     private val scanResultChannel = Channel<ScanResult<PartsData>>()
@@ -86,6 +85,7 @@ class WarehouseScanNMatchViewModel @Inject constructor(private val partsReposito
                 scanResult = ScanResult.Error()
             }
             _isLoading.value = false
+
             scanResultChannel.send(scanResult)
         }
 

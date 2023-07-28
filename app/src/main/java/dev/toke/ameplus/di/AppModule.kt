@@ -11,14 +11,18 @@ import dagger.hilt.components.SingletonComponent
 import dev.toke.ameplus.network.AMEPartsApi
 import dev.toke.ameplus.network.AmePlusApi
 import dev.toke.ameplus.network.ProductApi
+import dev.toke.ameplus.network.SortingApi
 import dev.toke.ameplus.repositories.AuthRepository
 import dev.toke.ameplus.repositories.AuthRepositoryImpl
 import dev.toke.ameplus.repositories.DataStoreRepository
 import dev.toke.ameplus.repositories.PartsRepository
+import dev.toke.ameplus.repositories.SortingRepository
+import dev.toke.ameplus.repositories.SortingRepositoryImpl
 import dev.toke.ameplus.services.ExoPlayerService
 import dev.toke.ameplus.utils.Constants
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import javax.inject.Singleton
 
 @Module
@@ -30,7 +34,7 @@ object AppModule {
     fun provideRetrofit(): Retrofit {
         Log.d("AppModule", "AuthApi provided")
         return Retrofit.Builder()
-            .baseUrl(Constants.API_BASE_URL_PROD)
+            .baseUrl(Constants.API_BASE_URL_DEV)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -54,6 +58,13 @@ object AppModule {
         return retrofit.create(AMEPartsApi::class.java)
     }
 
+    @Singleton
+    @Provides
+    fun provideSortingApi(retrofit: Retrofit): SortingApi {
+        return retrofit.create(SortingApi::class.java)
+    }
+
+
     @Provides
     @Singleton
     fun provideDataStoreRepository(@ApplicationContext context: Context): DataStoreRepository = DataStoreRepository(context)
@@ -76,4 +87,9 @@ object AppModule {
     @Provides
     @Singleton
     fun provideExoPlayer(@ApplicationContext context: Context): ExoPlayer = ExoPlayer.Builder(context).build()
+
+
+    @Provides
+    @Singleton
+    fun provideSortingRepository(sortingApi: SortingApi, authRepo: AuthRepositoryImpl): SortingRepository = SortingRepositoryImpl(sortingApi = sortingApi, authRepo = authRepo)
 }
