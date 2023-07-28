@@ -7,6 +7,7 @@ import dev.toke.ameplus.models.ProductCode
 import dev.toke.ameplus.models.ProductInfo
 import dev.toke.ameplus.network.AmePlusApi
 import dev.toke.ameplus.network.ProductApi
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import javax.inject.Inject
@@ -15,6 +16,7 @@ import javax.inject.Singleton
 @Singleton
 class ProductRepository @Inject constructor(private val productApi: ProductApi, private val authRepo: AuthRepositoryImpl) {
 
+    @OptIn(DelicateCoroutinesApi::class)
     suspend fun getPartCode(barcodeText: String) = GlobalScope.async {
        var productDto = DataOrException<ProductCode, Boolean, Exception>()
         try {
@@ -31,6 +33,7 @@ class ProductRepository @Inject constructor(private val productApi: ProductApi, 
         productDto
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     suspend fun getPartInfo(barcodeText: String) = GlobalScope.async {
         var productDto = DataOrException<ProductInfo, Boolean, Exception>()
         try {

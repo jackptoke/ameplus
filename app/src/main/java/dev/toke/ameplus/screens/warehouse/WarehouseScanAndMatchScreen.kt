@@ -50,16 +50,18 @@ import dev.toke.ameplus.utils.Constants
 import dev.toke.ameplus.utils.SystemBroadcastReceiver
 
 @Composable
-fun WarehouseScanAndMatchScreen(navController: NavController,
+fun WarehouseScanAndMatchScreen(/*navController: NavController,*/
                                 warehouseSAMSViewModel: WarehouseScanNMatchViewModel = hiltViewModel()) {
 
     val state = warehouseSAMSViewModel.scanState
     val context = LocalContext.current
     val numOfParts = warehouseSAMSViewModel.partsDataList.value?.count() ?: 0
-    val isMismatched =
-        numOfParts == 2 && ((warehouseSAMSViewModel.partsDataList.value?.get(0)?.get(0)?.partNumber
-            ?: "y") != (warehouseSAMSViewModel.partsDataList.value?.get(1)
-            ?.get(0)?.partNumber ?: "x"))
+    var isMismatched by remember {
+        mutableStateOf(false)
+    }
+//        numOfParts == 2 && ((warehouseSAMSViewModel.partsDataList.value?.get(0)?.get(0)?.partNumber
+//            ?: "y") != (warehouseSAMSViewModel.partsDataList.value?.get(1)
+//            ?.get(0)?.partNumber ?: "x"))
     var isMatched: Boolean by remember {
         mutableStateOf(false)
     }
@@ -72,7 +74,7 @@ fun WarehouseScanAndMatchScreen(navController: NavController,
             when(result) {
                 is ScanResult.Success -> {
                     Toast.makeText(context,"Success", Toast.LENGTH_SHORT).show()
-                    val isMismatched =
+                    isMismatched =
                         warehouseSAMSViewModel.partsDataList.value?.count() == 2 && ((warehouseSAMSViewModel.partsDataList.value?.get(0)?.get(0)?.partNumber
                             ?: "y") != (warehouseSAMSViewModel.partsDataList.value?.get(1)
                             ?.get(0)?.partNumber ?: "x"))
@@ -96,7 +98,7 @@ fun WarehouseScanAndMatchScreen(navController: NavController,
         val action = receivedIntent?.action ?: return@SystemBroadcastReceiver
         Log.d("BroadCastReceiver", action)
         if(action == Constants.ACTIVITY_INTENT_FILTER_ACTION) {
-            val barcode = receivedIntent?.getStringExtra(Constants.DATAWEDGE_INTENT_KEY_DATA) ?: ""
+            val barcode = receivedIntent.getStringExtra(Constants.DATAWEDGE_INTENT_KEY_DATA) ?: ""
             if(barcode.isNotBlank()) {
                 if(state.firstBarcode.isBlank())
                     warehouseSAMSViewModel.onEvent(ScanUiEvent.FirstScanEvent(barcode = barcode))
@@ -151,7 +153,7 @@ fun WarehouseScanAndMatchScreen(navController: NavController,
                         warehouseSAMSViewModel.partsDataList.value?.let {
                             items(it[selectedPartIndex]) {part ->
                                 PartShowcase(title = part.partNumber, subTitle = part.partTitle,
-                                    imageUrl = "${Constants.IMAGE_BASE_URL}${part.imagePath}")
+                                    imageUrl = if(!part.imagePath.isNullOrEmpty()) "${Constants.IMAGE_BASE_URL}${part.imagePath}" else "")
                             }
                         }
                     }
@@ -191,9 +193,8 @@ fun WarehouseScanAndMatchScreen(navController: NavController,
                     }
                     else {
                         for ((index, part) in partsList.withIndex()) {
-                            val imageUrl = "${Constants.IMAGE_BASE_URL}${part[0].imagePath}"
                             AsyncImage(
-                                model = imageUrl,
+                                model = if(part[0].imagePath.isNullOrEmpty()) R.drawable.no_image_placeholder else "${Constants.IMAGE_BASE_URL}${part[0].imagePath}",
                                 contentDescription = "Part Description",
                                 contentScale = ContentScale.FillHeight,
                                 modifier = Modifier
@@ -257,5 +258,5 @@ fun PartShowcase(imageUrl: String = "https://images.unsplash.com/photo-160849933
     }
 }
 
-data class Part(val partNumber: String, val revision: String, val imageUrl: String)
+data class Part(val partNumber: String = "", val revision: String = "", val imageUrl: String = "")
 

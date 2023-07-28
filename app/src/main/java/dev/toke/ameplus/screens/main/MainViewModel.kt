@@ -23,7 +23,6 @@ class MainViewModel @Inject constructor(private val authRepo: AuthRepository): V
                 signOut()
             }
 
-            else -> {}
         }
     }
 

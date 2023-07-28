@@ -43,7 +43,7 @@ class LoginViewModel @Inject constructor(private val authRepo: AuthRepository): 
 //                Log.d("LoginViewModel", "OnEvent - signing out")
 //                signOut()
 //            }
-            else -> {}
+//            else -> {}
         }
     }
 

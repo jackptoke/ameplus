@@ -1,5 +1,6 @@
 package dev.toke.ameplus.repositories
 
+import android.media.session.MediaSession.Token
 import android.util.Log
 import androidx.lifecycle.LiveData
 import dev.toke.ameplus.dtos.SSOUser
@@ -17,7 +18,11 @@ class AuthRepositoryImpl @Inject constructor(private val authApi: AmePlusApi, pr
         try {
             val token = dataStoreRepository.getTokenFromDataStore()
             // TODO
-            return AuthResult.UnknownError()
+            var tokenResponse: TokenResponse? = null
+            token.collect{
+                tokenResponse = it
+            }
+            return AuthResult.Authorized<TokenResponse?>(data = tokenResponse)
         } catch(exception: HttpException) {
             if(exception.code() == 401) {
                 return AuthResult.Unauthorized()

@@ -8,5 +8,6 @@ enum class AMEPlusScreens {
     LoginScreen,
     PrintersScreen,
     SettingScreen,
-    WarehouseScanAndMatchScreen
+    WarehouseScanAndMatchScreen,
+    SortingScreen
 }

@@ -8,6 +8,7 @@ import dev.toke.ameplus.screens.despatch.DespatchScreen
 import dev.toke.ameplus.screens.login.LoginScreen
 import dev.toke.ameplus.screens.main.AMEPlusMainScreen
 import dev.toke.ameplus.screens.splash.AMEPlusSplashScreen
+import dev.toke.ameplus.screens.sorting.SortingScreen
 import dev.toke.ameplus.screens.warehouse.WarehouseScanAndMatchScreen
 
 @Composable
@@ -23,15 +24,21 @@ fun AMEPlusNavigation() {
         }
         
         composable(AMEPlusScreens.DespatchScreen.name) {
-            DespatchScreen(navController = navController)
+            DespatchScreen(/*navController = navController*/)
         }
 
         composable(AMEPlusScreens.WarehouseScanAndMatchScreen.name) {
-            WarehouseScanAndMatchScreen(navController = navController)
+            WarehouseScanAndMatchScreen(/*navController = navController*/)
+        }
+
+        composable(AMEPlusScreens.SortingScreen.name) {
+            SortingScreen(/*navController = navController*/)
         }
         
         composable(AMEPlusScreens.LoginScreen.name) {
             LoginScreen(navController = navController)
         }
+
+
     }
 }

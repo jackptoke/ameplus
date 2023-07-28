@@ -5,7 +5,7 @@ object Constants {
     const val DATAWEDGE_INTENT_KEY_SOURCE = "com.symbol.datawedge.source"
     const val DATAWEDGE_INTENT_LABEL_TYPE = "com.symbol.datawedge.label_type"
     const val DATAWEDGE_INTENT_KEY_DATA = "com.symbol.datawedge.data_string"
-    const val API_BASE_URL_DEV = "https://892f-58-96-100-14.ngrok-free.app/api/"
+    const val API_BASE_URL_DEV = "https://0dde-159-196-193-127.ngrok-free.app/api/"
     const val API_BASE_URL_PROD = "https://ameictapi-test.amevic.amesystems.com.au/api/"
     const val IMAGE_BASE_URL = "https://ameictapi-test.amevic.amesystems.com.au/api/Parts/Image?filename="
     const val PARTS_URL = "Parts"

@@ -13,8 +13,8 @@ import javax.inject.Singleton
 @Singleton
 interface AMEPartsApi {
     @GET("Parts/{partNumber}/ImagesAndNotes")
-    suspend fun getParts(@Path("partNumber") partNumber: String, @Header("Authorization") token: String): PartsData
+    suspend fun getParts(@Path("partNumber") partNumber: String, @Header("Authorization") token: String): PartsData?
 
     @GET("Parts")//?partNumber={partNumber}
-    suspend fun getPartByPartNumber(@Query("partNumber") partNumber: String, @Header("Authorization") token: String): ProductPart
+    suspend fun getPartByPartNumber(@Query("partNumber") partNumber: String, @Header("Authorization") token: String): ProductPart?
 }

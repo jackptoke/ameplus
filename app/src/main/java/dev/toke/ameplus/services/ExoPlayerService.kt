@@ -6,28 +6,28 @@ import androidx.media3.datasource.RawResourceDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import dev.toke.ameplus.R
 
-class ExoPlayerService(context: Context) {
-    private lateinit var exoPlayer: ExoPlayer
+class ExoPlayerService(exoPlayer: ExoPlayer) {
+    private lateinit var _exoPlayer: ExoPlayer
 
     init {
-        exoPlayer = ExoPlayer.Builder(context).build()
+        _exoPlayer = exoPlayer
 
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun  playError() {
-        setAudioFile(R.raw.lostitem)
+        setAudioFile(R.raw.doh)
     }
 
     fun playGoodSound() {
-        setAudioFile(R.raw.correct_choice)
+        setAudioFile(R.raw.woohoo)
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-    private fun  setAudioFile(file: Int = R.raw.lostitem) {
+    private fun  setAudioFile(file: Int = R.raw.woohoo) {
         val errorFileUri = RawResourceDataSource.buildRawResourceUri(file).toString()
-        exoPlayer.setMediaItem(MediaItem.fromUri(errorFileUri))
-        exoPlayer.prepare()
-        exoPlayer.playWhenReady = true
+        _exoPlayer.setMediaItem(MediaItem.fromUri(errorFileUri))
+        _exoPlayer.prepare()
+        _exoPlayer.playWhenReady = true
     }
 }

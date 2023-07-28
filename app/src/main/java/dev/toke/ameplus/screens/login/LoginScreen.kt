@@ -32,9 +32,9 @@ import dev.toke.ameplus.navigation.AMEPlusScreens
 @Composable
 fun LoginScreen(navController: NavController,
                 viewModel: LoginViewModel = hiltViewModel()) {
-    var username by remember {
-        mutableStateOf("")
-    }
+//    var username by remember {
+//        mutableStateOf("")
+//    }
 
     val state = viewModel.state
     val context = LocalContext.current

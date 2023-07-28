@@ -2,6 +2,7 @@ package dev.toke.ameplus.di
 
 import android.content.Context
 import android.util.Log
+import androidx.media3.exoplayer.ExoPlayer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,7 +19,6 @@ import dev.toke.ameplus.services.ExoPlayerService
 import dev.toke.ameplus.utils.Constants
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import javax.inject.Singleton
 
 @Module
@@ -71,6 +71,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideExoPlayerService(@ApplicationContext context: Context): ExoPlayerService = ExoPlayerService(context)
+    fun provideExoPlayerService(exoPlayer: ExoPlayer): ExoPlayerService = ExoPlayerService(exoPlayer)
 
+    @Provides
+    @Singleton
+    fun provideExoPlayer(@ApplicationContext context: Context): ExoPlayer = ExoPlayer.Builder(context).build()
 }

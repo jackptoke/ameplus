@@ -7,21 +7,24 @@ import dev.toke.ameplus.models.PartsData
 import dev.toke.ameplus.models.ProductPart
 import dev.toke.ameplus.network.AMEPartsApi
 import dev.toke.ameplus.network.AmePlusApi
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import java.net.URLEncoder
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class PartsRepository @Inject constructor(private val partApi: AMEPartsApi, private val authRepo: AuthRepositoryImpl) {
 
+    @OptIn(DelicateCoroutinesApi::class)
     suspend fun getParts(partNumber: String) = GlobalScope.async {
         val partsDto = DataOrException<PartsData, Boolean, Exception>()
-        Log.d("PartsRepository", "getParts - Token: ${ authRepo.accessToken.value?.token }")
+        Log.d("PartsRepository", "Part: ${URLEncoder.encode(partNumber, "UTF-8")}")
         try {
           partsDto.loading = true
           partsDto.data = authRepo.accessToken.value?.let { partApi.getParts(partNumber, token = "Bearer ${it.token}") }
-          Log.d("PartsRepository", "Part: $partNumber Result: ${partsDto.data?.toString()}")
+          Log.d("PartsRepository", "Part: ${URLEncoder.encode(partNumber, "UTF-8")} Result: ${partsDto.data?.toString()}")
           if(partsDto.data != null) {
               Log.d("PartsRepository", "Part: $partNumber - Positive - ${ (partsDto.data as PartsData).toString() }")
           }
@@ -34,6 +37,7 @@ class PartsRepository @Inject constructor(private val partApi: AMEPartsApi, priv
         partsDto
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     suspend fun getPart(partNumber: String) = GlobalScope.async {
         val partDto = DataOrException<ProductPart, Boolean, Exception>()
         try {

@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.toke.ameplus.R
+import dev.toke.ameplus.components.BarcodeText
 import dev.toke.ameplus.data.ScanUiEvent
 import dev.toke.ameplus.utils.ColorConstants
 import dev.toke.ameplus.utils.Constants
@@ -46,7 +47,7 @@ import dev.toke.ameplus.utils.SystemBroadcastReceiver
 import kotlinx.coroutines.flow.collect
 
 @Composable
-fun DespatchScreen(navController: NavController,
+fun DespatchScreen(/*navController: NavController,*/
                    despatchViewModel: DespatchViewModel = hiltViewModel()) {
     var partNumber by remember {
         mutableStateOf(TextFieldValue("Part Number"))
@@ -70,10 +71,6 @@ fun DespatchScreen(navController: NavController,
 
     val state = despatchViewModel.scanState
     val context = LocalContext.current
-
-    val badSoundPlayer: MediaPlayer = MediaPlayer.create(context, R.raw.lostitem)
-    val goodSoundPlayer: MediaPlayer = MediaPlayer.create(context, R.raw.correct_choice)
-
 
     LaunchedEffect(despatchViewModel, context) {
         despatchViewModel.scanResults.collect {result ->
@@ -136,7 +133,7 @@ fun DespatchScreen(navController: NavController,
         val action = receivedIntent?.action ?: return@SystemBroadcastReceiver
         Log.d("BroadCastReceiver", action)
         if(action == Constants.ACTIVITY_INTENT_FILTER_ACTION) {
-            val barcode = receivedIntent?.getStringExtra(Constants.DATAWEDGE_INTENT_KEY_DATA) ?: ""
+            val barcode = receivedIntent.getStringExtra(Constants.DATAWEDGE_INTENT_KEY_DATA) ?: ""
             if(barcode.isNotBlank()) {
                 if(state.partFromProductNumber != null && state.partFromBarcodeText != null)
                 {
@@ -191,19 +188,3 @@ fun DespatchScreen(navController: NavController,
     }
 }
 
-@Composable
-fun BarcodeText(
-    text: TextFieldValue,
-    label: String,
-    modifier: Modifier,
-    enabled: Boolean,
-    style: TextStyle) {
-    OutlinedTextField(value = text,
-        onValueChange = { /* NOTHING */ },
-        label = { Text(label, style = MaterialTheme.typography.titleSmall) },
-        placeholder = { Text("BARCODE", style = MaterialTheme.typography.headlineLarge) },
-        modifier = modifier,
-        enabled = enabled,
-        textStyle = style,
-    )
-}

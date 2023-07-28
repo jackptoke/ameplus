@@ -77,6 +77,9 @@ fun AMEPlusMainScreen(navController: NavController = rememberNavController(),
     navButtons.add(AMENavButton(iconId = R.drawable.local_shipping, buttonText = "Despatch",
         color = ColorConstants.PrimaryColor,
         onClick = { navController.navigate(AMEPlusScreens.DespatchScreen.name )}))
+    navButtons.add(AMENavButton(iconId = R.drawable.content_cut, buttonText = "Sorting",
+        color = ColorConstants.PrimaryColor,
+        onClick = { navController.navigate(AMEPlusScreens.SortingScreen.name )}))
     navButtons.add(AMENavButton(iconId = R.drawable.receipt_long, buttonText = "Bosch Label",
         color = ColorConstants.PrimaryColor,
         onClick = { navController.navigate(AMEPlusScreens.DespatchScreen.name )}))
@@ -87,9 +90,6 @@ fun AMEPlusMainScreen(navController: NavController = rememberNavController(),
         color = ColorConstants.PrimaryColor,
         onClick = { navController.navigate(AMEPlusScreens.DespatchScreen.name )}))
     navButtons.add(AMENavButton(iconId = R.drawable.inventory_2, buttonText = "Inventory",
-        color = ColorConstants.PrimaryColor,
-        onClick = { navController.navigate(AMEPlusScreens.DespatchScreen.name )}))
-    navButtons.add(AMENavButton(iconId = R.drawable.content_cut, buttonText = "Cutting End",
         color = ColorConstants.PrimaryColor,
         onClick = { navController.navigate(AMEPlusScreens.DespatchScreen.name )}))
     navButtons.add(AMENavButton(iconId = R.drawable.flight_land, buttonText = "P.O. ETA",

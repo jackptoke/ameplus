@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WarehouseScanNMatchViewModel @Inject constructor(val partsRepository: PartsRepository, val exoPlayerService: ExoPlayerService) : ViewModel() {
+class WarehouseScanNMatchViewModel @Inject constructor(private val partsRepository: PartsRepository, private val exoPlayerService: ExoPlayerService) : ViewModel() {
 
     private lateinit var exoPlayer: ExoPlayer
     var scanState by mutableStateOf(ScanAndMatchState())
@@ -74,21 +74,11 @@ class WarehouseScanNMatchViewModel @Inject constructor(val partsRepository: Part
                 if((data?.count() ?: 0) > 0) {
                     _partsDataList.value?.add(data!!)
                     Log.d("WSNMViewModel", "Count items: ${partsDataList.value?.count()}")
-
-                    when(scanState.scanEvent) {
-                        is ScanUiEvent.FirstScanEvent -> {
-                            scanState = scanState.copy( firstBarcode = partNumber)
-                        }
-                        is ScanUiEvent.SecondScanEvent -> {
-                            scanState = scanState.copy(secondBarcode = partNumber)
-                        }
-                        is ScanUiEvent.ScanResetEvent -> {
-                            scanState = scanState.copy(firstBarcode = partNumber)
-                        }
-                    }
+                    updateScanState(partNumber)
                     scanResult = ScanResult.Success(data = data)
                 }
                 else {
+                    scanResult = ScanResult.NotFound()
                     Log.d("WSNMViewModel", "failed")
                 }
             }catch(exception: Exception) {
@@ -99,6 +89,20 @@ class WarehouseScanNMatchViewModel @Inject constructor(val partsRepository: Part
             scanResultChannel.send(scanResult)
         }
 
+    }
+
+    fun updateScanState(partNumber: String) {
+        when(scanState.scanEvent) {
+            is ScanUiEvent.FirstScanEvent -> {
+                scanState = scanState.copy( firstBarcode = partNumber)
+            }
+            is ScanUiEvent.SecondScanEvent -> {
+                scanState = scanState.copy(secondBarcode = partNumber)
+            }
+            is ScanUiEvent.ScanResetEvent -> {
+                scanState = scanState.copy(firstBarcode = partNumber)
+            }
+        }
     }
 
     fun playGoodSound() {
