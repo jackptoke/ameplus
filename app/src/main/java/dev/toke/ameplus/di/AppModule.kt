@@ -34,7 +34,7 @@ object AppModule {
     fun provideRetrofit(): Retrofit {
         Log.d("AppModule", "AuthApi provided")
         return Retrofit.Builder()
-            .baseUrl(Constants.API_BASE_URL_DEV)
+            .baseUrl(Constants.API_BASE_URL_PROD)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
